@@ -10,3 +10,24 @@
   max-height: 300px;
   overflow: auto;
 }
+
+h5{
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.messageInput[data-isVisible="false"], .loginBox[data-isVisible="true"]{
+  display: none;
+}
+
+.loginBox[data-isVisible="false"], .messageInput[data-isVisible="true"]{
+  display: block;
+}
+
+.sendBtn{
+  float: right;
+}
+
+.card .card-content{
+  padding: 15px;
+}

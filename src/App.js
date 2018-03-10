@@ -14,7 +14,8 @@ class App extends Component{
     this.state={
       posts:[],
       newPostBody:'',
-      newPostUser:''
+      loggedUser:'',
+      loggedIn: false
     }
     var config = {
       apiKey: "AIzaSyCYTMkLrNxVEcl80fTYM2pmqHwpKZVHImE",
@@ -44,21 +45,23 @@ class App extends Component{
     //actualiza la copia del estado
     posts.push(response);
     //actualizar el estado
+    posts.reverse();
     this.setState(posts);
   }
 
   //Esta función concatena los valores y los envía al array
-  addPost = (newPostBody, newPostUser) => {
-    const newState = Object.assign({},this.state);
+  addPost = (newPostBody, loggedUser) => {
+    //const newState = Object.assign({},this.state);
 
-    //newState.posts.push({name: this.state.newPostUser, message: this.state.newPostBody});
+    //newState.posts.push({name: this.state.loggedUser, message: this.state.newPostBody});
     //copiar el estado
-    const postToSave = {name: this.state.newPostUser, message: this.state.newPostBody}
+    const postToSave = {name: this.state.loggedUser, message: this.state.newPostBody}
 
     //newState.newPostBody= '';
     //this.setState(newState);
     //guarda en firebase nuestros posts
     this.databseRef.push().set(postToSave);
+    this.setState({ newPostBody:''})
   }
   //Esta función gestiona el valor del input mensaje
   handlePostEditorInputChange = (e)=>{
@@ -67,8 +70,15 @@ class App extends Component{
   }
   //Esta función gestiona el valor del input usuario
   handlePostUserNameChange = (e)=>{
-    this.setState({newPostUser: e.target.value
+    this.setState({loggedUser: e.target.value
     });
+  }
+  //login functions
+  handleLogin = () => {
+    this.setState({ loggedIn: true});
+  }
+  handleLogout = () => {
+    this.setState({ loggedIn: false, loggedUser: '', newPostBody:''})
   }
   //siempre van antes del render y después del constructor
   render(){
@@ -76,14 +86,26 @@ class App extends Component{
       <Row className="mainContainer">
         <h4>Chat React</h4>
         <Col s={12}>
-            <CardPanel s={12} className="lighten-4 black-text messageBox">
+            <CardPanel className="lighten-4 black-text messageBox">
               {this.state.posts.map((item,idx) => {
                 return(<Post key={idx} userName={item.name} postBody={item.message} />)
               })}
             </CardPanel>
-            <Input onChange={this.handlePostUserNameChange} placeholder="Mr. Stranger" s={12} label="Tu nombre" />
-            <Input onChange={this.handlePostEditorInputChange} placeholder="Hello World" s={12} label="Escribe tu mensaje" />
-            <Button onClick={this.addPost} waves='light' node='a'>Enviar</Button>
+
+            <CardPanel className="lighten-4 black-text loginBox" data-isVisible={this.state.loggedIn}>
+              <h5>Haz login para comenzar a chatear!</h5>
+              <Input onChange={this.handlePostUserNameChange} s={12} label="Tu nombre" placeholder="Mr. Stranger" value={this.state.loggedUser} />
+              <Button onClick={this.handleLogin} waves='light' node='a' large={true}> Entrar </Button>
+            </CardPanel>
+
+            <CardPanel className="lighten-4 black-text messageInput" data-isVisible={this.state.loggedIn}>
+              <h5> Hola {this.state.loggedUser}!! </h5>
+              <Input onChange={this.handlePostEditorInputChange} label="Escribe tu mensaje" placeholder="Say something" s={12} value={this.state.newPostBody} />
+              <Button className="sendBtn" onClick={this.addPost} waves='light' node='a' large={true}> Enviar </Button>
+              <Button onClick={this.handleLogout} waves='light' node='a' large={true}> logout </Button>
+            </CardPanel>
+
+
         </Col>
       </Row>
     )
